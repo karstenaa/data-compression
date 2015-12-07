@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <string.h>
 #include "idc.h"
-#include "idc.c"
 /**********************************************************************
 *                                                                      *
 *  File: huff_enc.c                                                    *
@@ -44,7 +43,6 @@ void main(int argc, char **argv)
 	float prob[256],p;
 	extern int optint;
 	extern char *optarg;
-
 	ifp = stdin;
 	t = 0;  /*flag to see if an input filename was given*/
 	ofp = stdout;
@@ -52,6 +50,9 @@ void main(int argc, char **argv)
 	cfp = NULL;
 	sfp = NULL;
 	num = 256;
+	unsigned char lastByte; //total bit needed on last byte
+	unsigned char *encodedFile; /*pointer to an array for file */
+
 
     code = (unsigned int *)malloc(num*sizeof(unsigned int));
     length = (char *)malloc(num*sizeof(char));
@@ -135,6 +136,7 @@ void main(int argc, char **argv)
 
     /* get memory for file */
     file = (unsigned char*)malloc(2*size*sizeof(unsigned char));
+    encodedFile = (unsigned char*)malloc(2*size*sizeof(unsigned char));
     if (file == NULL)
     {
         printf("Unable to allocate memory for file.\n");
@@ -196,9 +198,9 @@ void main(int argc, char **argv)
 	}
 
     //	fprintf(stderr,"After cfp==NULL\n");
-
+	
     /* encode file */
-	size=files(size,code,length,file);
+	size=files(size,code,length,file,encodedFile, &lastByte);
 
     //	fprintf(stderr,"After size   \n");
 
@@ -206,15 +208,14 @@ void main(int argc, char **argv)
     /*	if(x==0)
         fwrite(&size,sizeof(int),1,ofp);
     */
-
-	if(sfp == NULL)
+	if(sfp == NULL && cfp == NULL)
 	{
         /* write encoded file to file */
 	    fwrite(code,sizeof(unsigned int),num,ofp);
 		fwrite(length,sizeof(char),num,ofp);
 	}
-
-    fwrite(file,sizeof(unsigned char),size,ofp);
+	fwrite(&lastByte, sizeof(char),1,ofp);
+    fwrite(encodedFile,sizeof(unsigned char),size,ofp);
     fclose(ofp);
 
     /* write code to a file */

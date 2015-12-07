@@ -42,7 +42,7 @@ void main(int argc, char **argv)
 	char *length,t;  /* pointer to an array for code lengths */
 	extern int optint;
 	extern char *optarg;
-
+	char lastByte;
 	ifp = stdin;
 	t = 0; /* flag to see if an input filename was given */
 	ofp = stdout;
@@ -120,14 +120,14 @@ void main(int argc, char **argv)
 	fseek(ifp,0,2); /* set file pointer at end of file */
 	s = ftell(ifp); /* gets size of file */
 	fseek(ifp,0,0); /* set file pointer to begining of file */
-
 	if(cfp == NULL)
     {
 		fread(code,sizeof(unsigned int),num,ifp);
 		fread(length,sizeof(char),num,ifp);
 		s = s - ftell(ifp); /* s = the size of the encoded file */
-    }
-
+	}
+	fread(&lastByte, sizeof(char),1,ifp);
+	s = s-1;
     /* get memory for encoded file */
 	efile = (unsigned char *)malloc(s*sizeof(unsigned char));
 
@@ -145,7 +145,7 @@ void main(int argc, char **argv)
 	count = 0;
 	w = *(efile+count); /* w equals encoded word */
 	++count; /* counter to keep track of which word is being decoded */
-    for( ; count < s; )
+    for( ; count <= s; )
     {
         for(k = 0; k < 8; k++)
         {
@@ -165,6 +165,7 @@ void main(int argc, char **argv)
                     {
                         p = i; /* pixal value is a char */
                         *(file + l) = p; /* decoded image */
+                        printf("%c",p);
                         ++l; /* counter of length of image */
                         i = num; /* ends loop */
 					}
@@ -180,6 +181,11 @@ void main(int argc, char **argv)
                     }
                     word = 0; /* reset word */
                     size = 0; /* reset size */
+                    //exit when already in last byte and last bit
+                   // printf("(%d %d %d %d)\n",count,s, lastByte, k);
+                    if(count==s && lastByte==k+1){
+                    	k=8;
+					}
                 }
 			}
             word <<= 1;

@@ -30,7 +30,7 @@ void diff(int *diffs, unsigned char *image, int rows, int cols,int num, unsigned
 void getcode(FILE *fp, int num, unsigned int *code, char *length);
 void value(int *values, unsigned char *image, int size,int num);
 void images(int rows, int cols, int *code,char *length, unsigned char *file, unsigned char *dimage);
-int files(int size,int *code,char *length,unsigned char *file);
+int files(int size,int *code,char *length,unsigned char *file, unsigned char *encodedFile, unsigned char *lastByte);
 
 /* define the structure node */
 struct node
@@ -56,5 +56,6 @@ void create_code(NODE *root, int lgth, unsigned int *code, char *length);
 BTREE make_list (int num);
 void write_code(NODE *root, int lgth, unsigned int *code, char *length, int *loc);
 
+void traverseTree(NODE *node,int codeNow, int lengthNow, unsigned int *code, char *length);
 #define     myabs(x) ((x)<0? -(x): (x))
 #endif // IDC_H

@@ -11,11 +11,6 @@ void value(int *values, unsigned char *image, int size,int num)
     return;
 }
 
-void getcode(FILE *fp, int num, unsigned int *code, char *length)
-{
-    return;
-}
-
 void sort(float *prob, int *loc,int num)
 {
     int i,j;
@@ -80,6 +75,7 @@ void huff(float prob[], int loc[], int num, unsigned int *code, char *length)
 
         if (newNode->forward == head) head = newNode;
     }
+    create_code(head, 0, code,length);
     return;
 }
 
@@ -114,8 +110,59 @@ NODE* create_list(float prob[], int loc[], int num) {
     return head;
 }
 
-int files(int size,int *code,char *length,unsigned char *file)
+void create_code(NODE *root, int lgth, unsigned int *code, char *length){
+	traverseTree(root, 0, 0, code, length);
+}
+void traverseTree(NODE *node,int codeNow, int lengthNow, unsigned int *code, char *length){
+	if(node->left && node->right){
+		traverseTree(node->left, (codeNow << 1) + 0,lengthNow + 1, code, length);
+		traverseTree(node->right, (codeNow << 1) + 1, lengthNow + 1, code, length);
+	}
+	else{
+		//printf("%c %d %d\n", node->code, codeNow, lengthNow);
+		code[node->code] = codeNow;
+		length[node->code] = lengthNow;
+	}
+}
+int files(int size,int *code,char *length,unsigned char *file, unsigned char *encodedFile, unsigned char *lastByte)
 {
-//	return;
+	unsigned char buffer;
+	int bit=0;
+	int encodedSize=0;
+	int i;
+	for(i=0;i<size;i++){
+		char c = file[i];
+		unsigned char msb = 1 << length[c]-1;
+		//printf("%c %d %d ",c,code[c],length[c]);
+		while(msb){
+			buffer <<= 1;
+			if(msb & code[c]){
+				buffer++;
+			}
+			//printf("%d",buffer&1);
+			++bit;
+			if(bit==8){
+				encodedFile[encodedSize++]=buffer;
+				bit=0;
+				//printf("(%d) [%d]",buffer, encodedSize);
+			}
+			msb >>=1;
+		}
+		//printf("\n");
+	}
+	if(bit){
+		buffer <<= 8-bit;
+		encodedFile[encodedSize++]=buffer;
+		//printf("%d [%d]\n",bit, buffer);
+	}
+	(*lastByte)= bit;
+	//printf("%d",encodedSize);
+	//printf("%d",(*lastByte));
+	return encodedSize;
 }
 
+void getcode(FILE *fp, int num, unsigned int *code, char *length){
+	fread(code,sizeof(unsigned int),num,fp);
+	fread(length,sizeof(char),num,fp);
+    fclose(fp);
+}
