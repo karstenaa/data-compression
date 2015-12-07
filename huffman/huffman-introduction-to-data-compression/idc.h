@@ -56,6 +56,6 @@ void create_code(NODE *root, int lgth, unsigned int *code, char *length);
 BTREE make_list (int num);
 void write_code(NODE *root, int lgth, unsigned int *code, char *length, int *loc);
 
-void traverseTree(NODE *node,int codeNow, int lengthNow, unsigned int *code, char *length);
+void traverseTree(NODE *node,unsigned int codeNow, int lengthNow, unsigned int *code, char *length);
 #define     myabs(x) ((x)<0? -(x): (x))
 #endif // IDC_H

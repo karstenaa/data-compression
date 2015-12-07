@@ -113,13 +113,13 @@ NODE* create_list(float prob[], int loc[], int num) {
 void create_code(NODE *root, int lgth, unsigned int *code, char *length){
 	traverseTree(root, 0, 0, code, length);
 }
-void traverseTree(NODE *node,int codeNow, int lengthNow, unsigned int *code, char *length){
+void traverseTree(NODE *node, unsigned int codeNow, int lengthNow, unsigned int *code, char *length){
 	if(node->left && node->right){
 		traverseTree(node->left, (codeNow << 1) + 0,lengthNow + 1, code, length);
 		traverseTree(node->right, (codeNow << 1) + 1, lengthNow + 1, code, length);
 	}
 	else{
-		//printf("%c %d %d\n", node->code, codeNow, lengthNow);
+		//printf("%u %d\n",node->code,lengthNow);
 		code[node->code] = codeNow;
 		length[node->code] = lengthNow;
 	}
@@ -131,9 +131,9 @@ int files(int size,int *code,char *length,unsigned char *file, unsigned char *en
 	int encodedSize=0;
 	int i;
 	for(i=0;i<size;i++){
-		char c = file[i];
-		unsigned char msb = 1 << length[c]-1;
-		//printf("%c %d %d ",c,code[c],length[c]);
+		unsigned char c = file[i];
+		unsigned int msb = 1 << length[c]-1;
+		//printf("%u %d %d ",c,code[c],length[c]);
 		while(msb){
 			buffer <<= 1;
 			if(msb & code[c]){

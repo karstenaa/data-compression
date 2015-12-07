@@ -165,7 +165,7 @@ void main(int argc, char **argv)
                     {
                         p = i; /* pixal value is a char */
                         *(file + l) = p; /* decoded image */
-                        printf("%c",p);
+                        //printf("%c",p);
                         ++l; /* counter of length of image */
                         i = num; /* ends loop */
 					}
